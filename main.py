@@ -21,7 +21,7 @@ async def root():
     content = """
     <body>
     <form action="/detect" enctype="multipart/form-data" method="post">
-    <input name="files" type="file">
+    <input name="file" type="file">
     <input type="submit">
     </form>
     </body>
@@ -29,7 +29,7 @@ async def root():
     return HTMLResponse(content=content)
 
 
-@app.get("/detect")
+@app.post("/detect")
 async def detect(file: UploadFile):
     contents = await file.read()
     img = Image.open(io.BytesIO(contents))
