@@ -8,7 +8,7 @@ RUN apt update
 RUN apt install -y build-essential libfreetype6-dev libjpeg62-turbo-dev \
     libtiff5-dev libwebp-dev zlib1g-dev
 
-RUN conda install -c conda-forge tensorflow pillow numpy
+RUN conda install -c conda-forge --file requirements.txt
 
 RUN python3 -m pip install -r requirements.txt
 RUN python3 -c "import multipart; print(multipart.__version__)"
