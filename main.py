@@ -11,7 +11,7 @@ import tensorflow as tf
 
 app = FastAPI()
 
-model = tf.keras.models.load_model('/app/data/npk.h5')
+model = tf.keras.models.load_model('data/npk.h5')
 probability_model = tf.keras.Sequential([model,
                                          tf.keras.layers.Softmax()])
 
@@ -20,6 +20,7 @@ probability_model = tf.keras.Sequential([model,
 async def root():
     content = """
     <body>
+    <h2>Распознавание происхождения изображений</h2>
     <form action="/detect" enctype="multipart/form-data" method="post">
     <input name="file" type="file">
     <input type="submit">
@@ -33,9 +34,10 @@ async def root():
 async def detect(file: UploadFile):
     contents = await file.read()
     img = Image.open(io.BytesIO(contents))
+    img = img.resize((512, 512))
     img = tf.keras.utils.img_to_array(img)
     full_batch = tf.data.Dataset.from_tensors([img])
-    predictions = probability_model.predict(full_batch)
+    predictions = probability_model.predict(full_batch)[0]
     return {"prediction": {
         "artificial": numpy.asscalar(predictions[0]),
         "human": numpy.asscalar(predictions[1])
