@@ -1,4 +1,7 @@
 import io
+import multipart
+
+print("multipart v", multipart.__version__)
 
 from fastapi import FastAPI, UploadFile
 from fastapi.responses import HTMLResponse
@@ -11,6 +14,7 @@ app = FastAPI()
 model = tf.keras.models.load_model('/app/data/npk.h5')
 probability_model = tf.keras.Sequential([model,
                                          tf.keras.layers.Softmax()])
+
 
 @app.get("/")
 async def root():
