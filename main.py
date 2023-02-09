@@ -22,7 +22,7 @@ async def root():
     <body>
     <h2>Распознавание происхождения изображений</h2>
     <form action="/detect" enctype="multipart/form-data" method="post">
-    <input name="file" type="file">
+    <input name="file" type="file" accept="image/*">
     <input type="submit">
     </form>
     </body>
