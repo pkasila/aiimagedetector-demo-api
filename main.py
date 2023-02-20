@@ -9,7 +9,6 @@ from starlette.config import Config
 from starlette.requests import Request
 from starlette.middleware.sessions import SessionMiddleware
 from PIL import Image
-import numpy
 import tensorflow as tf
 
 app = FastAPI()
@@ -29,7 +28,17 @@ oauth.register(
     client_kwargs={'scope': 'user:email'},
 )
 
-model = tf.keras.models.load_model('data/npk.h5')
+model = tf.keras.models.load_model('data/npk.h5', compile=False)
+lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+    0.001,
+    decay_steps=100,
+    decay_rate=0.96,
+    staircase=True)
+
+model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=lr_schedule),
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+              metrics=['accuracy'])
+
 probability_model = tf.keras.Sequential([model,
                                          tf.keras.layers.Softmax()])
 
