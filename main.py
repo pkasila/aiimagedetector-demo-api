@@ -33,10 +33,12 @@ model = tf.keras.models.load_model('data/npk.h5')
 probability_model = tf.keras.Sequential([model,
                                          tf.keras.layers.Softmax()])
 
+
 @app.get("/login")
 async def login(request: Request):
     redirect_uri = 'https://aidetector-api.pkasila.net/auth'
     return await oauth.github.authorize_redirect(request, redirect_uri)
+
 
 @app.get("/auth")
 async def auth(request: Request):
@@ -44,13 +46,15 @@ async def auth(request: Request):
     user = token['userinfo']
     return dict(user)
 
+
 @app.post("/detect")
 async def detect(file: UploadFile):
     contents = await file.read()
-    img = tf.io.decode_image(contents, channels=3)
+    img = Image.open(io.BytesIO(contents))
     img = img.resize((512, 512))
-    img = tf.cast(img, tf.uint8)
-    predictions = probability_model(img[tf.newaxis, :, :, :]).numpy()
+    img = tf.keras.utils.img_to_array(img)[:, :, :3]
+    full_batch = tf.data.Dataset.from_tensors([img])
+    predictions = probability_model.predict(full_batch)[0]
     return {"prediction": {
         "artificial": numpy.asscalar(predictions[0]),
         "human": numpy.asscalar(predictions[1])
