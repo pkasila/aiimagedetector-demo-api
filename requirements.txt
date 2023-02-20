@@ -6,3 +6,4 @@ python-multipart
 uvicorn
 starlette
 authlib
+httpx
