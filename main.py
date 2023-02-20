@@ -56,6 +56,6 @@ async def detect(file: UploadFile):
     full_batch = tf.data.Dataset.from_tensors([img])
     predictions = probability_model.predict(full_batch)[0]
     return {"prediction": {
-        "artificial": numpy.asscalar(predictions[0]),
-        "human": numpy.asscalar(predictions[1])
+        "artificial": predictions.item(0),
+        "human": predictions.item(1)
     }}
