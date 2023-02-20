@@ -8,3 +8,5 @@ starlette
 authlib
 httpx
 itsdangerous
+SQLAlchemy
+psycopg

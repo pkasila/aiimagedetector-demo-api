@@ -47,11 +47,10 @@ async def auth(request: Request):
 @app.post("/detect")
 async def detect(file: UploadFile):
     contents = await file.read()
-    img = Image.open(io.BytesIO(contents))
+    img = tf.io.decode_image(contents, channels=3)
     img = img.resize((512, 512))
-    img = tf.keras.utils.img_to_array(img)
-    full_batch = tf.data.Dataset.from_tensors([img])
-    predictions = probability_model.predict(full_batch)[0]
+    img = tf.cast(img, tf.uint8)
+    predictions = probability_model(img[tf.newaxis, :, :, :]).numpy()
     return {"prediction": {
         "artificial": numpy.asscalar(predictions[0]),
         "human": numpy.asscalar(predictions[1])
