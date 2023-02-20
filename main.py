@@ -35,7 +35,7 @@ probability_model = tf.keras.Sequential([model,
 
 @app.get("/login")
 async def login(request: Request):
-    redirect_uri = request.url_for('auth')
+    redirect_uri = 'https://aidetector-api.pkasila.net/auth'
     return await oauth.github.authorize_redirect(request, redirect_uri)
 
 @app.get("/auth")
