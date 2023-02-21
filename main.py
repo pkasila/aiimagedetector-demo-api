@@ -71,7 +71,7 @@ async def detect(file: UploadFile):
 
     try:
         exif_data = src.getexif()
-        if predictions.item(1) < 0.5 and len(exif_data.keys()) > 8:
+        if predictions.item(1) < 0.5 and len(exif_data.keys()) > 4:
             m = hashlib.sha256()
             m.update(contents)
             file_name = f"data/exif_checked/{m.hexdigest()}.webp"
@@ -86,7 +86,7 @@ async def detect(file: UploadFile):
             "human": predictions.item(1)
         },
         "dataset_enhance": {
-            "has_device_exif": len(exif_data.keys()) > 8,
+            "has_device_exif": len(exif_data.keys()) > 4,
             "saved": saved
         }
     }
