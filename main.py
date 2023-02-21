@@ -1,5 +1,6 @@
 import io
 import multipart
+import hashlib
 
 print("multipart v", multipart.__version__)
 
@@ -59,12 +60,33 @@ async def auth(request: Request):
 @app.post("/detect")
 async def detect(file: UploadFile):
     contents = await file.read()
-    img = Image.open(io.BytesIO(contents))
-    img = img.resize((512, 512))
+    src = Image.open(io.BytesIO(contents))
+    img = src.resize((512, 512))
     img = tf.keras.utils.img_to_array(img)[:, :, :3]
     full_batch = tf.data.Dataset.from_tensors([img])
     predictions = probability_model.predict(full_batch)[0]
-    return {"prediction": {
-        "artificial": predictions.item(0),
-        "human": predictions.item(1)
-    }}
+
+    exif_data = {}
+    saved = False
+
+    try:
+        exif_data = src.getexif()
+        if predictions.item(1) < 0.5 and len(exif_data.keys()) > 0:
+            m = hashlib.sha256()
+            m.update(contents)
+            file_name = f"data/exif_checked/{m.hexdigest()}.webp"
+            src.save(file_name)
+            saved = True
+    except Exception as e:
+        print(e)
+
+    return {
+        "prediction": {
+            "artificial": predictions.item(0),
+            "human": predictions.item(1)
+        },
+        "dataset_enhance": {
+            "has_exif": len(exif_data.keys()) > 0,
+            "saved": saved
+        }
+    }
