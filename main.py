@@ -53,7 +53,7 @@ async def login(request: Request):
 @app.get("/auth")
 async def auth(request: Request):
     token = await oauth.github.authorize_access_token(request)
-    return token.__dict__
+    return token
 
 
 @app.post("/detect")
